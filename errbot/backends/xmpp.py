@@ -73,9 +73,10 @@ def verify_gtalk_cert(xmpp_client):
 
 
 class XMPPConnection(Connection):
-    def __init__(self, jid, password):
+    def __init__(self, jid, username, password):
         self.connected = False
-        self.client = ClientXMPP(jid, password, plugin_config={'feature_mechanisms': XMPP_FEATURE_MECHANISMS})
+        self.jid = jid
+        self.client = ClientXMPP(username, password, plugin_config={'feature_mechanisms': XMPP_FEATURE_MECHANISMS})
         self.client.register_plugin('xep_0030')  # Service Discovery
         self.client.register_plugin('xep_0045')  # Multi-User Chat
         self.client.register_plugin('old_0004')  # Multi-User Chat backward compability (necessary for join room)
@@ -93,7 +94,8 @@ class XMPPConnection(Connection):
         self.client.add_event_handler("ssl_invalid_cert", self.ssl_invalid_cert)
 
     def send_message(self, mess):
-        self.client.send_message(mto=mess.getTo(),
+        self.client.send_message(mfrom=self.jid,
+                                 mto=mess.getTo(),
                                  mbody=mess.getBody(),
                                  mtype=mess.getType(),
                                  mhtml=mess.getHTML())
@@ -145,7 +147,11 @@ class XMPPConnection(Connection):
 class XMPPBackend(ErrBot):
     def __init__(self, username, password, *args, **kwargs):
         super(XMPPBackend, self).__init__(*args, **kwargs)
-        self.jid = username
+        if 'jid' in kwargs:
+            self.jid = kwargs['jid']
+        else:
+            self.jid = username
+        self.username = username
         self.password = password
         self.conn = self.create_connection()
         self.conn.add_event_handler("message", self.incoming_message)
@@ -153,7 +159,7 @@ class XMPPBackend(ErrBot):
         self.conn.add_event_handler("disconnected", self.disconnected)
 
     def create_connection(self):
-        return XMPPConnection(self.jid, self.password)
+        return XMPPConnection(self.jid, self.username, self.password)
 
     def incoming_message(self, xmppmsg):
         """Callback for message events"""
