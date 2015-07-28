@@ -108,6 +108,7 @@ class XMPPIdentifier(object):
 class XMPPMUCRoom(MUCRoom):
     def __init__(self, *args, **kwargs):
         super(XMPPMUCRoom, self).__init__(*args, **kwargs)
+        self._bot = kwargs.get("bot")
         self.xep0045 = self._bot.conn.client.plugin['xep_0045']
 
     def join(self, username=None, password=None):
@@ -499,7 +500,7 @@ class XMPPBackend(ErrBot):
         if topic == "":
             topic = None
         self._room_topics[room] = topic
-        room = XMPPMUCRoom(event.values['mucroom'])
+        room = XMPPMUCRoom(event.values['mucroom'], bot=self)
         self.callback_room_topic(room)
 
     def user_changed_status(self, event):
@@ -563,7 +564,7 @@ class XMPPBackend(ErrBot):
         msg_type = mess.type
         response = self.build_message(text)
 
-        response.frm = self.bot_identity
+        response.frm = self.bot_identifier
         if msg_type == 'groupchat' and not private:
             # stripped returns the full bot@conference.domain.tld/chat_username
             # but in case of a groupchat, we should only try to send to the MUC address

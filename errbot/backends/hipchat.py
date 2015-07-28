@@ -45,16 +45,13 @@ class HipChatMUCRoom(XMPPMUCRoom):
     """
     This class represents a Multi-User Chatroom.
     """
-
-    def __init__(self, name, bot=None):
+    def __init__(self, name, *args, **kwargs):
         """
             :param name:
                 The name of the room
             """
-        super().__init__()
-        self._bot = bot
-        self.hypchat = bot.conn.hypchat
-        self.xep0045 = bot.conn.client.plugin['xep_0045']
+        super(HipChatMUCRoom, self).__init__(*args, **kwargs)
+        self.hypchat = self._bot.conn.hypchat
         self._name = name
 
     @property
@@ -381,7 +378,7 @@ class HipchatBackend(XMPPBackend):
         else:
             name = room
 
-        return HipChatMUCRoom(name, self)
+        return HipChatMUCRoom(name, bot=self)
 
     def groupchat_reply_format(self):
         return '@{0} {1}'

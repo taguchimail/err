@@ -437,6 +437,8 @@ class MUCRoom(object):
     """
     This class represents a Multi-User Chatroom.
     """
+    def __init__(self, *args, **kwargs):
+        pass
 
     def join(self, username=None, password=None):
         """
@@ -932,19 +934,9 @@ class Backend(object):
            usr in self.bot_config.ACCESS_CONTROLS[cmd]['denyusers']):
             raise ACLViolation("You're not allowed to access this command from this user")
         if typ == 'groupchat':
-            if not hasattr(mess.frm, 'room'):
-                raise Exception('mess.frm is not a MUCIdentifier as it misses the "room" property. Class of frm : %s'
-                                % mess.frm.__class__)
-            room = str(mess.frm.room)
             if ('allowmuc' in self.bot_config.ACCESS_CONTROLS[cmd] and
                self.bot_config.ACCESS_CONTROLS[cmd]['allowmuc'] is False):
                 raise ACLViolation("You're not allowed to access this command from a chatroom")
-            if ('allowrooms' in self.bot_config.ACCESS_CONTROLS[cmd] and
-               room not in self.bot_config.ACCESS_CONTROLS[cmd]['allowrooms']):
-                raise ACLViolation("You're not allowed to access this command from this room")
-            if ('denyrooms' in self.bot_config.ACCESS_CONTROLS[cmd] and
-               room in self.bot_config.ACCESS_CONTROLS[cmd]['denyrooms']):
-                raise ACLViolation("You're not allowed to access this command from this room")
         else:
             if ('allowprivate' in self.bot_config.ACCESS_CONTROLS[cmd] and
                self.bot_config.ACCESS_CONTROLS[cmd]['allowprivate'] is False):
