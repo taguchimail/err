@@ -71,11 +71,6 @@ def read(fname):
 if __name__ == "__main__":
     from version import VERSION
 
-    changes = read('CHANGES.rst')
-
-    if changes.find(VERSION) == -1:
-        raise Exception('You forgot to put a release note in CHANGES.rst ?!')
-
     if set(sys.argv) & {'bdist', 'bdist_dumb', 'bdist_rpm', 'bdist_wininst', 'bdist_msi'}:
         raise Exception("err doesn't support binary distributions")
 
@@ -99,7 +94,7 @@ if __name__ == "__main__":
         author="Guillaume BINET",
         author_email="gbin@gootz.net",
         description="err is a plugin based team chatbot designed to be easily deployable, extensible and maintainable.",
-        long_description=''.join([read('README.rst'), '\n\n', changes]),
+        long_description=''.join([read('README.rst')]),
         license="GPL",
         keywords="xmpp jabber chatbot bot plugin",
         url="http://errbot.net/",
